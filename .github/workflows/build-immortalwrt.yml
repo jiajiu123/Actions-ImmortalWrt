@@ -43,40 +43,40 @@ jobs:
     runs-on: ubuntu-slim
 
     steps:
-    # - name: Free up disk space
-    #   uses: jlumbroso/free-disk-space@main
-    #   with:
-    #     tool-cache: false
-    #     android: false
-    #     dotnet: false
-    #     haskell: false
-    #     large-packages: true
-    #     docker-images: true
-    #     swap-storage: true
+    - name: Free up disk space
+      uses: jlumbroso/free-disk-space@main
+      with:
+        tool-cache: false
+        android: false
+        dotnet: false
+        haskell: false
+        large-packages: true
+        docker-images: true
+        swap-storage: false
 
     - name: Initialization environment
       env:
         DEBIAN_FRONTEND: noninteractive
       run: |
         sudo ln -snf /usr/share/zoneinfo/$TZ /etc/localtime
-        # sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
+        sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
         sudo bash -c 'bash <(curl -s https://build-scripts.immortalwrt.org/init_build_environment.sh)'
-        # sudo -E apt remove -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin --fix-missing
-        # sudo -E apt -y autoremove --purge
+        sudo -E apt remove -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin --fix-missing
+        sudo -E apt -y autoremove --purge
         sudo mkdir -p /workdir
         # Fix the permissions by using $(whoami)
         sudo chown -R $(whoami):$(whoami) /workdir
 
-    # - name: Free up disk space again
-    #   uses: jlumbroso/free-disk-space@main
-    #   with:
-    #     tool-cache: true
-    #     android: false
-    #     dotnet: false
-    #     haskell: false
-    #     large-packages: false
-    #     docker-images: false
-    #     swap-storage: false
+    - name: Free up disk space again
+      uses: jlumbroso/free-disk-space@main
+      with:
+        tool-cache: true
+        android: false
+        dotnet: false
+        haskell: false
+        large-packages: false
+        docker-images: false
+        swap-storage: true
 
     - name: Checkout
       uses: actions/checkout@main
