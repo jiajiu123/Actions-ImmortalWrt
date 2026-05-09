@@ -36,6 +36,18 @@ on:
         description: 'Firmware Name'
         required: false
         default: ImmortalWrt
+      feeds_conf:
+        description: 'Custom feeds.conf.default file'
+        required: false
+        default: 'feeds.conf.default'
+      config:
+        description: 'Custom .config file'
+        required: false
+        default: '.config'
+      kernel_config:
+        description: 'Custom kernel config file'
+        required: false
+        default: 'config-6.12'
       artifact:
         description: 'Upload firmware to artifact'
         required: false
@@ -53,8 +65,6 @@ on:
         type: boolean
 
 env:
-  FEEDS_CONF: feeds.conf.default
-  CONFIG_FILE: .config
   BEFORE_FEED_SH: before-installing-feed.sh
   AFTER_FEED_SH: after-installing-feed.sh
   TZ: UTC
@@ -112,7 +122,7 @@ jobs:
 
     - name: Load custom feeds
       run: |
-        [ -e $FEEDS_CONF ] && mv $FEEDS_CONF openwrt/feeds.conf.default
+        [ -e ${{ inputs.feeds_conf }} ] && mv ${{ inputs.feeds_conf }} openwrt/feeds.conf.default
         chmod +x $BEFORE_FEED_SH
         cd openwrt
         $GITHUB_WORKSPACE/$BEFORE_FEED_SH
@@ -126,7 +136,8 @@ jobs:
     - name: Load custom configuration
       run: |
         [ -e files ] && mv files openwrt/files
-        [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
+        [ -e ${{ inputs.config }} ] && mv ${{ inputs.config }} openwrt/.config
+        [ -e ${{ inputs.kernel_config }} ] && mv ${{ inputs.kernel_config }} openwrttarget/linux/x86/${{ inputs.kernel_config }}
         chmod +x $AFTER_FEED_SH
         cd openwrt
         $GITHUB_WORKSPACE/$AFTER_FEED_SH
@@ -145,7 +156,7 @@ jobs:
         sed -i "/exit 0/i\sed -i '/DISTRIB_GITHUB/d' /etc/openwrt_release" openwrt/package/emortal/default-settings/files/99-default-settings
         sed -i "/DISTRIB_GITHUB/a\echo \"DISTRIB_GITHUB=\'https://github.com/${{github.repository}}\'\" >> /etc/openwrt_release" openwrt/package/emortal/default-settings/files/99-default-settings
         sed -i "/exit 0/i\sed -i '/DISTRIB_VERSIONS/d' /etc/openwrt_release" openwrt/package/emortal/default-settings/files/99-default-settings
-        sed -i "/DISTRIB_VERSIONS/a\echo \"DISTRIB_VERSIONS=\'${{env.BUILD_TIME}}_${{env.BUILD_NUMBER}}\'\" >> /etc/openwrt_release" openwrt/package/emortal/default-settings/files/99-default-settings
+        sed -i "/DISTRIB_VERSIONS/a\echo \"DISTRIB_VERSIONS=\'${{ env.BUILD_TIME }}_${{ env.BUILD_NUMBER }}\'\" >> /etc/openwrt_release" openwrt/package/emortal/default-settings/files/99-default-settings
         sudo chmod +x openwrt/files/usr/bin/easyupdate.sh
 
     - name: SSH connection to Actions
