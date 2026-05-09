@@ -81,6 +81,7 @@ jobs:
         sudo ln -snf /usr/share/zoneinfo/$TZ /etc/localtime
         sudo rm -rf /etc/apt/sources.list.d/*
         sudo bash -c 'bash <(curl -s https://build-scripts.immortalwrt.org/init_build_environment.sh)'
+        sudo apt -y install erofs-utils
         sudo apt -y autoremove golang-* --purge
         sudo rm -rf /usr/bin/go /usr/bin/gofmt /usr/lib/go-* /usr/lib/go-[0-9]*
         sudo mkdir -p /workdir
@@ -133,15 +134,21 @@ jobs:
     - name: Install feeds
       run: cd openwrt && ./scripts/feeds install -a -f
 
-    - name: Load custom configuration
-      run: |
-        [ -e files ] && mv files openwrt/files
-        [ -e ${{ inputs.config }} ] && mv ${{ inputs.config }} openwrt/.config
-        [ -e ${{ inputs.kernel_config }} ] && mv ${{ inputs.kernel_config }} openwrttarget/linux/x86/${{ inputs.kernel_config }}
-        chmod +x $AFTER_FEED_SH
-        cd openwrt
-        $GITHUB_WORKSPACE/$AFTER_FEED_SH
-        cat package/emortal/default-settings/files/99-default-settings
+    - name: SSH connection to Actions
+      uses: owenthereal/action-upterm@main
+      if: (github.event.inputs.ssh == 'true' && github.event.inputs.ssh  != 'false') || contains(github.event.action, 'ssh')
+      with:
+        wait-timeout-minutes: 15
+
+    # - name: Load custom configuration
+    #   run: |
+    #     [ -e files ] && mv files openwrt/files
+    #     [ -e ${{ inputs.config }} ] && mv ${{ inputs.config }} openwrt/.config
+    #     [ -e ${{ inputs.kernel_config }} ] && mv ${{ inputs.kernel_config }} openwrttarget/linux/x86/${{ inputs.kernel_config }}
+    #     chmod +x $AFTER_FEED_SH
+    #     cd openwrt
+    #     $GITHUB_WORKSPACE/$AFTER_FEED_SH
+    #     cat package/emortal/default-settings/files/99-default-settings
 
     - name: Set variables
       run: |
