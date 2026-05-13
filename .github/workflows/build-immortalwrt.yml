@@ -89,7 +89,6 @@ jobs:
       env:
         DEBIAN_FRONTEND: noninteractive
       run: |
-        echo -e "$(nproc) thread compile"
         sudo ln -snf /usr/share/zoneinfo/$TZ /etc/localtime
         sudo apt update
         sudo apt -y install erofs-utils tmux gawk
