@@ -7,6 +7,8 @@ sed -i '/video/d' feeds.conf.default
 # Add feed sources
 echo 'src-git passwall2 https://github.com/Openwrt-Passwall/openwrt-passwall2;main' >> feeds.conf.default
 
+make defconfig
+
 # Add mosdns
 find ./ | grep Makefile | grep v2ray-geodata | xargs rm -f
 find ./ | grep Makefile | grep mosdns | xargs rm -f
