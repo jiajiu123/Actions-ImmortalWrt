@@ -67,11 +67,11 @@ on:
 env:
   BEFORE_FEED_SH: before-installing-feed.sh
   AFTER_FEED_SH: after-installing-feed.sh
-  TZ: UTC
+  TZ: Asia/Shanghai
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
     - name: Set default inputs
