@@ -71,7 +71,7 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
 
     steps:
     - name: Set default inputs
@@ -129,12 +129,16 @@ jobs:
         DEBIAN_FRONTEND: noninteractive
       run: |
         sudo ln -snf /usr/share/zoneinfo/$TZ /etc/localtime
-        sudo apt update
-        sudo apt -y install erofs-utils tmux gawk qemu-utils
-        sudo apt-mark hold apache2 apache2-bin apache2-data apache2-utils azure-cli curl distro-info-data docker-ce-cli dpkg-dev dpkg gh  gir1.2-packagekitglib-1.0 git git-man iproute2 kmod kubectl libavahi-client3 libavahi-common-data libavahi-common3 libcap2 libcap2-bin libcurl3t64-gnutls libcurl4t64 libdpkg-perl libnghttp2-14 libpng16-16t64 libkmod2 liblcms2-2 libntfs-3g89t64 libpackagekit-glib2-18 libpam-cap libpolkit-agent-1-0 libpolkit-gobject-1-0 linux-azure linux-cloud-tools-azure linux-cloud-tools-common linux-headers-azure linux-image-azure linux-tools-azure linux-tools-common nginx nginx-common ntfs-3g open-vm-tools openssh-client openssh-server openssh-sftp-server packagekit packagekit-tools powershell rsyslog snapd ssh ubuntu-pro-client ubuntu-pro-client-l10n vim vim-common vim-runtime vim-tiny xxd
-        sudo bash -c 'bash <(curl -s https://build-scripts.immortalwrt.org/init_build_environment.sh)'
-        sudo apt -y autoremove golang-* --purge
-        sudo rm -rf /usr/bin/go /usr/bin/gofmt /usr/lib/go-* /usr/lib/go-[0-9]*
+        sudo apt update -y
+        sudo apt full-upgrade -y
+        sudo apt install -y ack antlr3 asciidoc autoconf automake autopoint binutils bison build-essential \
+        bzip2 ccache clang cmake cpio curl device-tree-compiler ecj fastjar flex gawk gettext gcc-multilib \
+        g++-multilib git gnutls-dev gperf haveged help2man intltool lib32gcc-s1 libc6-dev-i386 libelf-dev \
+        libglib2.0-dev libgmp3-dev libltdl-dev libmpc-dev libmpfr-dev libncurses-dev libpython3-dev \
+        libreadline-dev libssl-dev libtool libyaml-dev libz-dev lld llvm lrzsz mkisofs msmtp nano \
+        ninja-build p7zip p7zip-full patch pkgconf python3 python3-pip python3-ply python3-docutils \
+        python3-pyelftools qemu-utils re2c rsync scons squashfs-tools subversion swig texinfo uglifyjs \
+        upx-ucl unzip vim wget xmlto xxd zlib1g-dev zstd
         sudo mkdir -p /workdir
         sudo chown -R $(whoami):$(whoami) /workdir
 
