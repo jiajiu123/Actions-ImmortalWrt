@@ -100,7 +100,6 @@ jobs:
         PAYLOAD_BINDIR: ${{ github.event.client_payload.bindir }}
       run: |
         {
-          echo "SSH=${PAYLOAD_SSH:-${INPUT_SSH:-false}}"
           echo "NOCACHE=${PAYLOAD_NOCACHE:-${INPUT_NOCACHE:-false}}"
           echo "REPO_URL=${PAYLOAD_REPO:-${INPUT_REPO:-https://github.com/immortalwrt/immortalwrt}}"
           echo "REPO_BRANCH=${PAYLOAD_BRANCH:-${INPUT_BRANCH:-openwrt-25.12}}"
