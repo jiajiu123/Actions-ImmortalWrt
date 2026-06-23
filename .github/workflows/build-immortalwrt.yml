@@ -113,16 +113,6 @@ jobs:
           echo "BINDIR=${PAYLOAD_BINDIR:-${INPUT_BINDIR:-false}}"
         } >> $GITHUB_ENV
 
-    - name: Free up disk space
-      uses: jlumbroso/free-disk-space@main
-      with:
-        tool-cache: false
-        android: true
-        dotnet: true
-        haskell: true
-        large-packages: true
-        docker-images: true
-        swap-storage: true
 
     - name: Initialization environment
       env:
@@ -142,22 +132,7 @@ jobs:
         sudo mkdir -p /workdir
         sudo chown -R $(whoami):$(whoami) /workdir
 
-    - name: Setup go
-      uses: actions/setup-go@main
-      with:
-        go-version: 'stable'
-        cache: false
 
-    - name: Free up disk space again
-      uses: jlumbroso/free-disk-space@main
-      with:
-        tool-cache: true
-        android: false
-        dotnet: false
-        haskell: false
-        large-packages: false
-        docker-images: false
-        swap-storage: false
 
     - name: Checkout
       uses: actions/checkout@main
@@ -169,23 +144,7 @@ jobs:
         git clone "$REPO_URL" -b "$REPO_BRANCH" openwrt
         ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
 
-    - name: Free up disk space again again
-      env:
-        DEBIAN_FRONTEND: noninteractive
-      run: |
-        sudo mkdir -p -m 777 /mnt/openwrt/dl /mnt/openwrt/staging_dir /mnt/openwrt/build_dir
-        rm -rf openwrt/dl openwrt/staging_dir openwrt/build_dir
-        ln -sf /mnt/openwrt/dl openwrt/dl
-        ln -sf /mnt/openwrt/staging_dir openwrt/staging_dir
-        ln -sf /mnt/openwrt/build_dir openwrt/build_dir
 
-    - name: Cache
-      uses: stupidloud/cachewrtbuild@main
-      with:
-        ccache: 'true'
-        prefix: ${{ github.workspace }}/openwrt
-        clean: '${{ env.NOCACHE }}'
-        mixkey: x86-64
 
     - name: Load custom feeds
       run: |
@@ -218,13 +177,6 @@ jobs:
         grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/' > DEVICE_NAME
         [ -s DEVICE_NAME ] && echo "DEVICE_NAME=$(cat DEVICE_NAME)" >> $GITHUB_ENV
 
-    - name: Make Easy Update Script happy
-      run: |
-        sed -i "/exit 0/i\sed -i '/DISTRIB_GITHUB/d' /etc/openwrt_release" openwrt/package/emortal/default-settings/files/99-default-settings
-        sed -i "/DISTRIB_GITHUB/a\echo \"DISTRIB_GITHUB=\'https://github.com/${{github.repository}}\'\" >> /etc/openwrt_release" openwrt/package/emortal/default-settings/files/99-default-settings
-        sed -i "/exit 0/i\sed -i '/DISTRIB_VERSIONS/d' /etc/openwrt_release" openwrt/package/emortal/default-settings/files/99-default-settings
-        sed -i "/DISTRIB_VERSIONS/a\echo \"DISTRIB_VERSIONS=\'${{ env.BUILD_TIME }}_${{ env.BUILD_NUMBER }}\'\" >> /etc/openwrt_release" openwrt/package/emortal/default-settings/files/99-default-settings
-        sudo chmod +x openwrt/files/usr/bin/easyupdate.sh
 
     - name: SSH connection to Actions
       uses: owenthereal/action-upterm@main
@@ -246,14 +198,9 @@ jobs:
       run: |
         cd openwrt
         echo -e "$(nproc) thread compile"
-        make -j1 V=s
+        make -j$(nproc)
         echo "status=success" >> $GITHUB_OUTPUT
 
-    - name: Setup tmate session on failure
-      if: failure()
-      uses: mxschmitt/action-tmate@v3
-      with:
-        detached: true
     - name: Check space usage
       if: (!cancelled())
       run: df -hT
