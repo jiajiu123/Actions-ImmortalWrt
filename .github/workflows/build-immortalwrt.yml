@@ -132,8 +132,6 @@ jobs:
         sudo mkdir -p /workdir
         sudo chown -R $(whoami):$(whoami) /workdir
 
-
-
     - name: Checkout
       uses: actions/checkout@main
 
@@ -144,15 +142,6 @@ jobs:
         git clone "$REPO_URL" -b "$REPO_BRANCH" openwrt
         ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
 
-
-
-    - name: Load custom feeds
-      run: |
-        [ -e "$FEEDS_CONF" ] && mv "$FEEDS_CONF" openwrt/feeds.conf.default
-        chmod +x $BEFORE_FEED_SH
-        cd openwrt
-        $GITHUB_WORKSPACE/$BEFORE_FEED_SH
-
     - name: Update feeds
       run: cd openwrt && ./scripts/feeds update -a
 
@@ -161,28 +150,8 @@ jobs:
 
     - name: Load custom configuration
       run: |
-        [ -e files ] && mv files openwrt/files
         [ -e "$BUILD_CONFIG" ] && mv "$BUILD_CONFIG" openwrt/.config
         [ -e "$KERNEL_CONFIG" ] && mv "$KERNEL_CONFIG" "openwrt/target/linux/x86/$KERNEL_CONFIG"
-        chmod +x $AFTER_FEED_SH
-        cd openwrt
-        $GITHUB_WORKSPACE/$AFTER_FEED_SH
-        cat package/emortal/default-settings/files/99-default-settings
-
-    - name: Set variables
-      run: |
-        echo "BUILD_TIME=$(date +"%Y%m%d%H%M")" >> $GITHUB_ENV
-        echo "BUILD_NUMBER=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
-        cd openwrt
-        grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/' > DEVICE_NAME
-        [ -s DEVICE_NAME ] && echo "DEVICE_NAME=$(cat DEVICE_NAME)" >> $GITHUB_ENV
-
-
-    - name: SSH connection to Actions
-      uses: owenthereal/action-upterm@main
-      if: env.SSH == 'true'
-      with:
-        wait-timeout-minutes: 15
 
     - name: Download package
       id: package
@@ -190,8 +159,6 @@ jobs:
         cd openwrt
         make defconfig
         make download -j8
-        find dl -size -1024c -exec ls -l {} \;
-        find dl -size -1024c -exec rm -f {} \;
 
     - name: Compile the firmware
       id: compile
