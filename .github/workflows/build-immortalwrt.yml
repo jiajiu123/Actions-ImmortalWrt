@@ -53,8 +53,7 @@ jobs:
       run: |
         cd openwrt
         mv .config openwrt/.config
-        mv config-6.12 openwrt/target/linux/x86/config-6.12
-
+        
     - name: Download package
       id: package
       run: |
