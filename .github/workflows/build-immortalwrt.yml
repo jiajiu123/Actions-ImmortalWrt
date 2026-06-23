@@ -11,6 +11,7 @@
 name: Build ImmortalWrt
 
 on:
+  push:
   workflow_dispatch:
 
 jobs:
