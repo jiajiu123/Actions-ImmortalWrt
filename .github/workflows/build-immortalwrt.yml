@@ -13,12 +13,105 @@ name: Build ImmortalWrt
 on:
   push:
   workflow_dispatch:
+    inputs:
+      ssh:
+        description: 'SSH connection to Actions'
+        required: false
+        default: false
+        type: boolean
+      nocache:
+        description: 'Clean Building Cache'
+        required: false
+        default: false
+        type: boolean
+      repo:
+        description: 'Repo URL'
+        required: false
+        default: https://github.com/immortalwrt/immortalwrt
+      branch:
+        description: 'Repo Branch'
+        required: false
+        default: openwrt-25.12
+      name:
+        description: 'Firmware Name'
+        required: false
+        default: ImmortalWrt
+      feeds_conf:
+        description: 'Custom feeds file'
+        required: false
+        default: 'feeds.conf.default'
+      config:
+        description: 'Custom build config'
+        required: false
+        default: '.config'
+      kernel_config:
+        description: 'Custom kernel build config'
+        required: false
+        default: 'config-6.12'
+      artifact:
+        description: 'Upload firmware to artifact'
+        required: false
+        default: true
+        type: boolean
+      release:
+        description: 'Upload firmware to release'
+        required: false
+        default: false
+        type: boolean
+      bindir:
+        description: 'Upload bin to artifact'
+        required: false
+        default: false
+        type: boolean
+
+env:
+  BEFORE_FEED_SH: before-installing-feed.sh
+  AFTER_FEED_SH: after-installing-feed.sh
+  TZ: Asia/Shanghai
 
 jobs:
   build:
     runs-on: ubuntu-22.04
-        
+
     steps:
+    - name: Set default inputs
+      env:
+        INPUT_SSH: ${{ inputs.ssh }}
+        INPUT_NOCACHE: ${{ inputs.nocache }}
+        INPUT_REPO: ${{ inputs.repo }}
+        INPUT_BRANCH: ${{ inputs.branch }}
+        INPUT_NAME: ${{ inputs.name }}
+        INPUT_FEEDS_CONF: ${{ inputs.feeds_conf }}
+        INPUT_CONFIG: ${{ inputs.config }}
+        INPUT_KERNEL_CONFIG: ${{ inputs.kernel_config }}
+        INPUT_ARTIFACT: ${{ inputs.artifact }}
+        INPUT_RELEASE: ${{ inputs.release }}
+        INPUT_BINDIR: ${{ inputs.bindir }}
+        PAYLOAD_SSH: ${{ github.event.client_payload.ssh }}
+        PAYLOAD_NOCACHE: ${{ github.event.client_payload.nocache }}
+        PAYLOAD_REPO: ${{ github.event.client_payload.repo }}
+        PAYLOAD_BRANCH: ${{ github.event.client_payload.branch }}
+        PAYLOAD_NAME: ${{ github.event.client_payload.name }}
+        PAYLOAD_FEEDS_CONF: ${{ github.event.client_payload.feeds_conf }}
+        PAYLOAD_CONFIG: ${{ github.event.client_payload.config }}
+        PAYLOAD_KERNEL_CONFIG: ${{ github.event.client_payload.kernel_config }}
+        PAYLOAD_ARTIFACT: ${{ github.event.client_payload.artifact }}
+        PAYLOAD_RELEASE: ${{ github.event.client_payload.release }}
+        PAYLOAD_BINDIR: ${{ github.event.client_payload.bindir }}
+      run: |
+        {
+          echo "SSH=${PAYLOAD_SSH:-${INPUT_SSH:-false}}"
+          echo "NOCACHE=${PAYLOAD_NOCACHE:-${INPUT_NOCACHE:-false}}"
+          echo "REPO_URL=${PAYLOAD_REPO:-${INPUT_REPO:-https://github.com/immortalwrt/immortalwrt}}"
+          echo "REPO_BRANCH=${PAYLOAD_BRANCH:-${INPUT_BRANCH:-openwrt-25.12}}"
+          echo "FIRMWARE_NAME=${PAYLOAD_NAME:-${INPUT_NAME:-ImmortalWrt}}"
+          echo "FEEDS_CONF=${PAYLOAD_FEEDS_CONF:-${INPUT_FEEDS_CONF:-feeds.conf.default}}"
+          echo "BUILD_CONFIG=${PAYLOAD_CONFIG:-${INPUT_CONFIG:-.config}}"
+          echo "KERNEL_CONFIG=${PAYLOAD_KERNEL_CONFIG:-${INPUT_KERNEL_CONFIG:-config-6.12}}"
+          echo "ARTIFACT=${PAYLOAD_ARTIFACT:-${INPUT_ARTIFACT:-true}}"
+          echo "RELEASE=${PAYLOAD_RELEASE:-${INPUT_RELEASE:-false}}"
+          echo "BINDIR=${PAYLOAD_BINDIR:-${INPUT_BINDIR:-false}}"
+        } >> $GITHUB_ENV
 
     - name: Initialization environment
       run: |
