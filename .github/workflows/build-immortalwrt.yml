@@ -41,7 +41,7 @@ jobs:
     - name: Clone source code
       working-directory: /workdir
       run: |
-        git clone "$REPO_URL" -b "$REPO_BRANCH" openwrt
+        git clone https://github.com/immortalwrt/immortalwrt -b openwrt-25.12 openwrt
 
     - name: Update feeds
       run: cd openwrt && ./scripts/feeds update -a
@@ -51,8 +51,9 @@ jobs:
 
     - name: Load custom configuration
       run: |
-        [ -e "$BUILD_CONFIG" ] && mv "$BUILD_CONFIG" openwrt/.config
-        [ -e "$KERNEL_CONFIG" ] && mv "$KERNEL_CONFIG" "openwrt/target/linux/x86/$KERNEL_CONFIG"
+        cd openwrt
+        mv .config openwrt/.config
+        mv config-6.12 openwrt/target/linux/x86/config-6.12
 
     - name: Download package
       id: package
@@ -66,4 +67,3 @@ jobs:
         cd openwrt
         echo -e "$(nproc) thread compile"
         make -j$(nproc)
-        echo "status=success" >> $GITHUB_OUTPUT
