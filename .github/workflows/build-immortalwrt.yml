@@ -39,8 +39,11 @@ jobs:
       uses: actions/checkout@main
 
     - name: Clone source code
+      working-directory: /workdir
       run: |
+        df -hT $PWD
         git clone https://github.com/immortalwrt/immortalwrt -b openwrt-25.12 openwrt
+        ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
 
     - name: Update feeds
       run: cd openwrt && ./scripts/feeds update -a
