@@ -233,8 +233,8 @@ jobs:
         cd openwrt
         make defconfig
         make download -j8
-        find dl -size -1024c -exec ls -l {} \;
-        find dl -size -1024c -exec rm -f {} \;
+        find -L dl -type f -size -1024c -exec ls -l {} \;
+        find -L dl -type f -size -1024c -delete
 
     - name: Compile the firmware
       id: compile
