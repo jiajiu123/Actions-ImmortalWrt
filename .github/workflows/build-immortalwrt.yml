@@ -233,16 +233,13 @@ jobs:
         make download -j8
         find -L dl -type f -size -1024c -exec ls -l {} \;
         find -L dl -type f -size -1024c -delete
-  
-    - name: SSH connection to Actions
-      uses: mxschmitt/action-tmate@v3
 
     - name: Compile the firmware
       id: compile
       run: |
         cd openwrt
         echo -e "$(nproc) thread compile"
-        make -j$(nproc)
+        make -j1 V=s
         echo "status=success" >> $GITHUB_OUTPUT
 
     - name: Check space usage
