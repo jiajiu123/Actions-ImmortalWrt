@@ -226,6 +226,7 @@ jobs:
       if: env.SSH == 'true'
       with:
         wait-timeout-minutes: 15
+        limit-access-to-actor: false
 
     - name: Download package
       id: package
