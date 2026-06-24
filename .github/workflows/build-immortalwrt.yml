@@ -241,7 +241,7 @@ jobs:
       run: |
         cd openwrt
         echo -e "$(nproc) thread compile"
-        make -j1 V=s
+        make -j$(nproc)
         echo "status=success" >> $GITHUB_OUTPUT
 
     - name: Check space usage
