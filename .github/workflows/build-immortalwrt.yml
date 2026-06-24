@@ -233,6 +233,9 @@ jobs:
         make download -j8
         find -L dl -type f -size -1024c -exec ls -l {} \;
         find -L dl -type f -size -1024c -delete
+  
+    - name: SSH connection to Actions
+      uses: mxschmitt/action-tmate@v3
 
     - name: Compile the firmware
       id: compile
