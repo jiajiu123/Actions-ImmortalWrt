@@ -222,11 +222,8 @@ jobs:
         sudo chmod +x openwrt/files/usr/bin/easyupdate.sh
 
     - name: SSH connection to Actions
-      uses: owenthereal/action-upterm@main
+      uses: mxschmitt/action-tmate@v3
       if: env.SSH == 'true'
-      with:
-        wait-timeout-minutes: 15
-        limit-access-to-actor: false
 
     - name: Download package
       id: package
