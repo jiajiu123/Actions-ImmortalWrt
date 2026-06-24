@@ -245,7 +245,6 @@ jobs:
     - name: Check space usage
       if: (!cancelled())
       uses: mxschmitt/action-tmate@v3
-      run: df -hT
 
     - name: Upload bin directory
       uses: actions/upload-artifact@main
