@@ -109,7 +109,6 @@ jobs:
           echo "BUILD_CONFIG=${PAYLOAD_CONFIG:-${INPUT_CONFIG:-.config}}"
           echo "KERNEL_CONFIG=${PAYLOAD_KERNEL_CONFIG:-${INPUT_KERNEL_CONFIG:-config-6.12}}"
           echo "ARTIFACT=${PAYLOAD_ARTIFACT:-${INPUT_ARTIFACT:-true}}"
-          echo "BINDIR=${PAYLOAD_BINDIR:-${INPUT_BINDIR:-false}}"
         } >> $GITHUB_ENV
 
     - name: Free up disk space
@@ -239,7 +238,7 @@ jobs:
       run: |
         cd openwrt
         echo -e "$(nproc) thread compile"
-        make -j1 V=s
+        make -j$(nproc)
         echo "status=success" >> $GITHUB_OUTPUT
 
     - name: Check space usage
