@@ -180,8 +180,7 @@ jobs:
         prefix: ${{ github.workspace }}/openwrt
         clean: '${{ env.NOCACHE }}'
         mixkey: x86-64
-    - name: SSH connection to Actions
-      uses: mxschmitt/action-tmate@v3
+
     - name: Load custom feeds
       run: |
         [ -e "$FEEDS_CONF" ] && mv "$FEEDS_CONF" openwrt/feeds.conf.default
@@ -191,6 +190,13 @@ jobs:
 
     - name: Update feeds
       run: cd openwrt && ./scripts/feeds update -a
+
+    - name: Install Mosdns
+      run: |
+        find ./ | grep Makefile | grep v2ray-geodata | xargs rm -f
+        find ./ | grep Makefile | grep mosdns | xargs rm -f
+        git clone https://github.com/sbwml/luci-app-mosdns -b v5 package/mosdns
+        git clone https://github.com/sbwml/v2ray-geodata package/v2ray-geodata
 
     - name: Install feeds
       run: cd openwrt && ./scripts/feeds install -a -f
