@@ -253,10 +253,6 @@ jobs:
       if: (!cancelled())
       run: df -hT
 
-    - name: SSH
-      if: (!cancelled())
-      uses: mxschmitt/action-tmate@v3
-
     - name: Upload bin directory
       uses: actions/upload-artifact@main
       if: steps.compile.outputs.status == 'success' && env.BINDIR == 'true' && !cancelled()
