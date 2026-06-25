@@ -180,7 +180,8 @@ jobs:
         prefix: ${{ github.workspace }}/openwrt
         clean: '${{ env.NOCACHE }}'
         mixkey: x86-64
-
+    - name: SSH connection to Actions
+      uses: mxschmitt/action-tmate@v3
     - name: Load custom feeds
       run: |
         [ -e "$FEEDS_CONF" ] && mv "$FEEDS_CONF" openwrt/feeds.conf.default
